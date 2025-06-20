@@ -14,11 +14,11 @@ cursor = conn.cursor()
 
 #taking inputs
 student_name = input("Enter your name: ")
-while len(student_name)>30:
+while student_name and len(student_name)>30:
     student_name = input("the length should be less than 30. Enter again: ")
 
 college_name = input("Enter your college name: ")
-while len(college_name)>50:
+while college_name and len(college_name)>50:
     college_name = input("the length should be less than 50. Enter again: ")
     
 round1 = float(input("enter round 1 marks: "))
@@ -42,22 +42,37 @@ print(total_marks)
 
 def calc_res(total_marks):
     if(total_marks<35):
-        print('rejected')
+        return 'rejected'
     else:
-        print('selected')
+        return 'selected'
         
 def calc_place(total_marks):
     if(total_marks>=45):
-        print('1st')
+        return 1
     elif(total_marks>=40):
-        print('2nd')
+        return 2
     elif(total_marks>=35):
-        print('3rd')
+        return 3
     else:
-        print('sorry you are not selected')
+        return 0
+    
+def calc_percent(marks, t_marks):
+    percent = marks*100/t_marks
+    return percent
+
+round1_per = calc_percent(round1, 10)
+round2_per = calc_percent(round2, 10)
+round3_per = calc_percent(round3, 10)
+techround_per = calc_percent(tech_round, 20)
+
+#updated logic
+if round1_per >= 70 and round2_per >= 70 and round3_per >= 70 and techround_per >= 70:
+    result = 'selected'
+else:
+    result = 'rejected'
+
         
 # we will calculate result and rank and store them in the following variables respectively
-result = calc_res(total_marks)
 rank = calc_place(total_marks)
 
 #inserting into db
@@ -66,15 +81,56 @@ cursor.execute(query, (student_name, college_name, round1, round2, round3, tech_
 conn.commit()
 
 #printing values
-cursor.execute("SELECT * FROM assessment")
-rows = cursor.fetchall()
-print('Student name | College Name | Round1 marks | round2 marks | round3 marks | technical round marks | total marks | result | rank')
-for row in rows:
-    print(row)
-    
-#then to Display the list of all the candidate sorted with their ranking and results we will execute the following query
-# query1 = """SELECT student_name, result, place FROM assessment GROUP BY results"""
-# cursor.execute(query)
+# query1 = """SELECT student_name, total_marks, result, place FROM assessment ORDER BY total_marks DESC"""
+# cursor.execute(query1)
+# rows = cursor.fetchall()
+# print('Student name | total marks | result | rank')
+# for row in rows:
+#     print(row)
 
-# query2 = """SELECT student_name, result, place FROM assessment GROUP BY place"""
+#printing values
+# cursor.execute("SELECT * FROM assessment")
+# rows = cursor.fetchall()
+# print('Student name | College Name | Round1 marks | round2 marks | round3 marks | technical round marks | total marks | result | rank')
+# for row in rows:
+#     print(row)
+    
+# cursor.execute("DELETE FROM assessment")
+# conn.commit()
+# query = """SELECT student_name, college_name, total_marks, place FROM assessment ORDER BY place ASC"""
 # cursor.execute(query)
+# rows = cursor.fetchall()
+# query1 = """SELECT student_name, college_name, total_marks, place FROM assessment WHERE result = %s"""
+# query2 = """SELECT student_name, college_name, total_marks, place FROM assessment WHERE result = %s"""
+# cursor.execute("SELECT student_name, college_name, total_marks, place FROM assessment WHERE result = 'selected'")
+# # cursor.execute("SELECT student_name, college_name, total_marks, place FROM assessment WHERE result = %s", 'rejected')
+# rows = cursor.fetchall()
+
+# print("student_name, college_name, total_marks, place ")
+# for row in rows:
+#     print(row[0], row[1], row[2], row[3])
+
+# cursor.execute("SELECT student_name, college_name, total_marks, place FROM assessment WHERE result = 'rejected'")
+
+# rows = cursor.fetchall()
+
+# print("student_name, college_name, total_marks, place ")
+# for i in rows:
+#     print(i[0], i[1], i[2], i[3])
+    
+
+
+
+cursor.execute("UPDATE assessment SET result = result")
+# cursor.execute("SELECT student_name, college_name, total_marks, place FROM assessment WHERE result = 'rejected'")
+
+# cursor.execute("SELECT * FROM assessment")
+rows = cursor.fetchall()
+# print("student_name, college_name, total_marks, place ")
+for i in rows:
+    print("\n",rows)
+    
+cursor.execute("SELECT * FROM assessment WHERE total_marks>35")
+rows = cursor.fetchall()
+for i in rows:
+    print("\n",rows)
